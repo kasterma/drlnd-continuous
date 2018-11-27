@@ -15,3 +15,7 @@ To start working with the environment run
     
 and open `files/Continous_Control.ipynb`.  In this notebook (as provided by udacity) you can see some initial
 interaction with the Reacher environment, and with that see that the core dependencies are correctly installed.
+
+# TODO
+
+- In the unity environment there is a parameter train_mode; currently unclear what that does to the environment.
