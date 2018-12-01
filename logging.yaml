@@ -11,6 +11,8 @@ handlers:
 loggers:
   interact:
     level: DEBUG
+  environment:
+    level: DEBUG
 root:
   level: DEBUG
   handlers: [console]
