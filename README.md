@@ -19,3 +19,6 @@ interaction with the Reacher environment, and with that see that the core depend
 # TODO
 
 - In the unity environment there is a parameter train_mode; currently unclear what that does to the environment.
+- Set up in the better style of a package with src/ directory and tox for testing
+- Investiage the Ornstein-Uhlenbeck process some more; main question why not add some basic Gaussian noise
+  - after have functioning training process, try with different noise distributions
