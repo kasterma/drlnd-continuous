@@ -13,6 +13,8 @@ loggers:
     level: DEBUG
   environment:
     level: DEBUG
+  agent:
+    level: DEBUG
 root:
   level: DEBUG
   handlers: [console]
