@@ -1,16 +1,11 @@
-from typing import List, Tuple
+import random
+from collections import deque
+from typing import Tuple
 
 import numpy as np
-from collections import deque
-import random
 import torch
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-
-class NotEnoughExperiences(Exception):
-    """Exception to throw when Experiences is asked for a sample but doesn't have enough data yet"""
-    pass
 
 
 class Experience:
@@ -49,15 +44,22 @@ class Experiences:
         self.sample_size = batch_size      # in the current learning method we return a sample the size of a batch
 
     def add(self, experience: Experience) -> None:
+        """Record the experience.
+
+        Note: because we use a limited size deque old experiences drop out from the set we sample.  This is currently
+        the only device for using only recent experiences.
+        """
         self.memory.append(experience)
 
     def sample(self) -> Tuple[torch.tensor, torch.tensor, torch.tensor, torch.tensor, torch.tensor]:
-        try:
-            sample = random.sample(self.memory, k=self.sample_size)
-        except ValueError:
-            raise NotEnoughExperiences()
+        """Get a sample of the recorded experiences.
+
+        :raise ValueError: when trying to get a sample that is larger than the number of recorded experiences.
+        """
+        sample = random.sample(self.memory, k=self.sample_size)
 
         def to_float_tensor(dat):
+            # noinspection PyUnresolvedReferences
             return torch.from_numpy(np.vstack(dat)).float().to(device)
 
         states_tensor = to_float_tensor([e.state for e in sample])
@@ -68,3 +70,5 @@ class Experiences:
 
         return states_tensor, actions_tensor, rewards_tensor, next_states_tensor, dones_tensor
 
+    def __len__(self):
+        return len(self.memory)
