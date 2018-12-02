@@ -19,15 +19,15 @@ log = logging.getLogger("environment")
 class StepResult:
     """Wrapper object for the information extracted from the unity environment"""
 
-    def __init__(self, done: bool, rewards: List, new_state: np.ndarray):
+    def __init__(self, done: bool, rewards: List, next_state: np.ndarray):
         # Note: we check some types here, not very pythonic, but mostly to check understanding of the environment
         # This understanding will help avoid errors later on when using this data.
-        assert type(done) == np.bool_
+        assert type(done[0]) == bool and type(done) == list
         assert type(rewards) == list and len(rewards) == 20
-        assert new_state.shape == (20, 33)
+        assert next_state.shape == (20, 33)
         self.done = done
         self.rewards = rewards
-        self.new_state = new_state
+        self.next_state = next_state
 
 
 class Reacher:
@@ -35,9 +35,15 @@ class Reacher:
         self.env = UnityEnvironment(file_name="files/Reacher.app")
         log.info("Reacher environment set up")
 
-    def reset(self, train_mode=True) -> None:
-        self.env.reset(train_mode=train_mode)
+    def reset(self, train_mode=True) -> np.ndarray:
+        """Reset the environment
+
+        :param train_mode boolean to indicate whether to start environment in train mode
+        :return the initial state
+        """
+        env_info = self.env.reset(train_mode=train_mode)["ReacherBrain"]
         log.info("Reacher environment reset with train_mode=%s", train_mode)
+        return env_info.vector_observations
 
     def step(self, action: np.ndarray) -> StepResult:
         """Take the action in the environment and collect the relevant information to return from the environment"""
@@ -45,6 +51,10 @@ class Reacher:
         assert action.shape == (20, 4)
         action_clipped = np.clip(action, -1, 1)
         env_info = self.env.step(action_clipped)["ReacherBrain"]
-        return StepResult(done=np.any(env_info.local_done),
+        # check the assumption that the end of an interaction is determined by a number of steps, hence all are done
+        # at the same time
+        if np.any(env_info.local_done):
+            assert np.all(env_info.local_done)
+        return StepResult(done=env_info.local_done,
                           rewards=env_info.rewards,
-                          new_state=env_info.vector_observations)
+                          next_state=env_info.vector_observations)
