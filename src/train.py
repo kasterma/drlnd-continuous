@@ -2,7 +2,7 @@
 #
 # This code is the primary interface to start and evaluate the training for the continous project.
 
-from drlnd_continuous import *
+from src.drlnd_continuous import *
 import numpy as np
 
 

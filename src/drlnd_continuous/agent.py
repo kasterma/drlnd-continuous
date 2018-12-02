@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 
-from drlnd_continuous.experience import Experience, Experiences
+from src.drlnd_continuous.experience import Experience, Experiences
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
