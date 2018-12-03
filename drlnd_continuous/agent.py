@@ -58,6 +58,9 @@ class Agent:
         self.step_count = 0
         self.update_every = UPDATE_EVERY
 
+    def reset(self, idx):
+        self.noise = OUNoise(self.action_size, mu=0.0, theta=1/(idx + 2), sigma=1/(idx + 2))
+
     def record_experience(self, experience: Experience):
         self.experiences.add(experience)
         self.step_count += 1

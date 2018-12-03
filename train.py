@@ -50,6 +50,7 @@ def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100
     :param print_every give an update on progress after this many episodes
     :param run_id id to use in saving models
     """
+    log.info("Run with id %s", run_id)
     env = Reacher()
     agent = Agent(replay_memory_size=10000, state_size=33, action_size=4)
     state = env.reset(train_mode=False)
@@ -57,6 +58,7 @@ def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100
     scores_deque = deque(maxlen=print_every)
     for episode_idx in range(number_episodes):
         env.reset()
+        agent.reset(episode_idx)
         score = 0
         for step_idx in range(max_t):
             # noinspection PyUnresolvedReferences

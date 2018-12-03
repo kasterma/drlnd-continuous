@@ -22,3 +22,18 @@ interaction with the Reacher environment, and with that see that the core depend
 - Set up in the better style of a package with src/ directory and tox for testing
 - Investiage the Ornstein-Uhlenbeck process some more; main question why not add some basic Gaussian noise
   - after have functioning training process, try with different noise distributions
+
+# Notes
+
+## run 0
+
+Didn't learn.  Looked at the noise some more, and the values are off.  Fixed to
+mean 0 noise for next run.
+
+## run 1
+
+Didn't learn.
+
+## run 2
+
+Trying to reduce the noise over time.
