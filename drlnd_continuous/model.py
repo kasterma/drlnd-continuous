@@ -38,7 +38,7 @@ class Actor(nn.Module):
         self.state_size = state_size
         self.action_size = action_size
         self.fc1_units = fc1_units
-        self.fc3_units = fc2_units
+        self.fc2_units = fc2_units
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
         self.fc3 = nn.Linear(fc2_units, action_size)
@@ -49,7 +49,7 @@ class Actor(nn.Module):
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
         self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
-    def forward(self, state: Union[np.ndarray, torch.tensor]) -> torch.tensor:
+    def forward(self, state: torch.tensor) -> torch.tensor:
         """Build an actor (policy) network that maps states -> actions."""
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
@@ -79,7 +79,7 @@ class Critic(nn.Module):
         self.state_size = state_size
         self.action_size = action_size
         self.fc1_units = fcs1_units
-        self.fc3_units = fc2_units
+        self.fc2_units = fc2_units
 
         self.fcs1 = nn.Linear(state_size, fcs1_units)
         self.fc2 = nn.Linear(fcs1_units+action_size, fc2_units)
@@ -91,7 +91,7 @@ class Critic(nn.Module):
         self.fc2.weight.data.uniform_(*hidden_init(self.fc2))
         self.fc3.weight.data.uniform_(-3e-3, 3e-3)
 
-    def forward(self, state: Union[np.ndarray, torch.tensor], action: Union[np.ndarray, torch.tensor]) -> torch.tensor:
+    def forward(self, state: torch.tensor, action: torch.tensor) -> torch.tensor:
         """Build a critic (value) network that maps (state, action) pairs -> Q-values."""
         xs = F.relu(self.fcs1(state))
         # noinspection PyUnresolvedReferences

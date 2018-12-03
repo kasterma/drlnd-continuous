@@ -34,12 +34,7 @@ class Experiences:
     agent for learning (the agent can ignore that it seems to store numpy data and needs torch tensors).
     """
 
-    def __init__(self, memory_size=None, batch_size=None, *, config=None):
-        if config:
-            assert memory_size is None
-            assert batch_size is None
-            memory_size = config['experience_memory']['size']
-            batch_size = config['train']['batch_size']
+    def __init__(self, memory_size: int, batch_size: int):
         self.memory = deque(maxlen=memory_size)
         self.sample_size = batch_size      # in the current learning method we return a sample the size of a batch
 

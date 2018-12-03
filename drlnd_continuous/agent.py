@@ -1,9 +1,9 @@
 import logging.config
+import random
 
 import numpy as np
 import torch
-import random
-
+import torch.nn.functional as F
 import yaml
 from torch import optim
 
@@ -24,7 +24,8 @@ GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
 LR_CRITIC = 1e-3        # learning rate of the critic
-WEIGHT_DECAY = 0 # L2 weight decay
+WEIGHT_DECAY = 0        # L2 weight decay
+UPDATE_EVERY = 4        # do a learning update after this many recorded experiences
 
 
 class Agent:
@@ -54,19 +55,70 @@ class Agent:
         # Noise process
         self.noise = OUNoise(action_size)
 
+        self.step_count = 0
+        self.update_every = UPDATE_EVERY
+
     def record_experience(self, experience: Experience):
         self.experiences.add(experience)
-        if True: # time to learn
+        self.step_count += 1
+        if len(self.experiences) > BATCH_SIZE and self.step_count % self.update_every == 0:
+            log.debug("Doing a learning step")
             self.__learn()
 
-    def get_action(self, state: np.ndarray, eps: float) -> np.ndarray:
-        return self.model.eval(state)
+    def get_action(self, state: np.ndarray, add_noise=True) -> np.ndarray:
+        self.actor_local.eval()
+        with torch.no_grad():
+            action = self.actor_local(state).cpu().numpy()
+        if add_noise:
+            action += self.noise.sample()
+        return action
 
     def save(self, run_identifier: str) -> None:
-        pass
+        torch.save(self.actor_local.state_dict(), "trained_model-actor_local-{id}.pth".format(id=run_identifier))
+        torch.save(self.actor_target.state_dict(), "trained_model-actor_target-{id}.pth".format(id=run_identifier))
+        torch.save(self.critic_local.state_dict(), "trained_model-critic_local-{id}.pth".format(id=run_identifier))
+        torch.save(self.critic_target.state_dict(), "trained_model-critic_target-{id}.pth".format(id=run_identifier))
 
     def load(self, run_identifier: str) -> None:
-        pass
+        self.actor_local.load_state_dict(torch.load("trained_model-actor_local-{id}.pth".format(id=run_identifier)))
+        self.actor_target.load_state_dict(torch.load("trained_model-actor_target-{id}.pth".format(id=run_identifier)))
+        self.critic_local.load_state_dict(torch.load("trained_model-critic_local-{id}.pth".format(id=run_identifier)))
+        self.critic_target.load_state_dict(torch.load("trained_model-critic_target-{id}.pth".format(id=run_identifier)))
 
     def __learn(self):
-        pass
+        gamma = GAMMA
+        self.actor_local.train()  # the other models are never switched out of train mode
+        states, actions, rewards, next_states, dones = self.experiences.sample()
+
+        # ---------------------------- update critic ---------------------------- #
+        # Get predicted next-state actions and Q values from target models
+        actions_next = self.actor_target(next_states)
+        Q_targets_next = self.critic_target(next_states, actions_next)
+        # Compute Q targets for current states (y_i)
+        Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
+        # Compute critic loss
+        Q_expected = self.critic_local(states, actions)
+        critic_loss = F.mse_loss(Q_expected, Q_targets)
+        # Minimize the loss
+        self.critic_optimizer.zero_grad()
+        critic_loss.backward()
+        self.critic_optimizer.step()
+
+        # ---------------------------- update actor ---------------------------- #
+        # Compute actor loss
+        actions_pred = self.actor_local(states)
+        actor_loss = -self.critic_local(states, actions_pred).mean()
+        # Minimize the loss
+        self.actor_optimizer.zero_grad()
+        actor_loss.backward()
+        self.actor_optimizer.step()
+
+        # ----------------------- update target networks ----------------------- #
+        Agent.__soft_update(self.critic_local, self.critic_target, TAU)
+
+        Agent.__soft_update(self.actor_local, self.actor_target, TAU)
+
+    @staticmethod
+    def __soft_update(local_model, target_model, tau):
+        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
+            target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)

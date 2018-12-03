@@ -1,9 +1,18 @@
 # Training driver for the DRLND continuous project
 #
 # This code is the primary interface to start and evaluate the training for the continous project.
+import logging.config
+from collections import deque
+
+import yaml
 
 from drlnd_continuous import *
 import numpy as np
+
+with open("logging.yaml") as log_conf_file:
+    log_conf = yaml.load(log_conf_file)
+logging.config.dictConfig(log_conf)
+log = logging.getLogger("agent")
 
 
 def random_test_run():
@@ -12,7 +21,7 @@ def random_test_run():
     In this interaction also interact with the Agent (to test this interaction while developing it)
     """
     env = Reacher()
-    agent = Agent(10000)
+    agent = Agent(10000, action_size=4)
     state = env.reset(train_mode=False)
     for step_idx in range(100):
         # noinspection PyUnresolvedReferences
@@ -30,4 +39,47 @@ def random_test_run():
     agent.experiences.sample()
 
 
-random_test_run()
+# random_test_run()
+
+
+def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100, run_id=0):
+    """Perfor a training run
+
+    :param number_episodes the number of episodes to run through
+    :param max_t max length of an episode
+    :param print_every give an update on progress after this many episodes
+    :param run_id id to use in saving models
+    """
+    env = Reacher()
+    agent = Agent(replay_memory_size=10000, state_size=33, action_size=4)
+    state = env.reset(train_mode=False)
+    scores = []
+    scores_deque = deque(maxlen=print_every)
+    for episode_idx in range(number_episodes):
+        env.reset()
+        score = 0
+        for step_idx in range(max_t):
+            # noinspection PyUnresolvedReferences
+            act_random = np.clip(np.random.randn(20, 4), -1, 1)
+            step_result = env.step(act_random)
+            for agent_idx in range(20):
+                experience = Experience(state[agent_idx, :],
+                                        act_random[agent_idx, :],
+                                        step_result.rewards[agent_idx],
+                                        step_result.next_state[agent_idx, :],
+                                        step_result.done[agent_idx])
+                agent.record_experience(experience)
+                score += step_result.rewards[agent_idx]
+            if np.any(step_result.done):
+                break
+        scores.append(score)
+        scores_deque.append(score)
+        if episode_idx % print_every == 0:
+            log.info("Mean score over last %d episodes %f", print_every, np.mean(scores_deque))
+    agent.experiences.sample()
+    log.info("Saving models under id %s", run_id)
+    agent.save(run_id)
+    log.info("Saving scores to file scores-%d.npy", run_id)
+    np.save("scores-{}.npy".format(run_id), np.array(scores))
+
+train_run()
