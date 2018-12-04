@@ -58,8 +58,16 @@ class Agent:
         self.step_count = 0
         self.update_every = UPDATE_EVERY
 
-    def reset(self, idx):
-        self.noise = OUNoise(self.action_size, mu=0.0, theta=1/(idx + 2), sigma=1/(idx + 2))
+    def reset(self, idx=None):
+        """Reset the agent.
+
+        In particular we reset the noise process; when passed an integer the noise is scaled down proportional to that
+        integer.  Otherwise it is just a restart of the noise process.
+        """
+        if idx:
+            self.noise = OUNoise(self.action_size, mu=0.0, theta=1/(idx + 2), sigma=1/(idx + 2))
+        else:
+            self.noise.reset()
 
     def record_experience(self, experience: Experience):
         self.experiences.add(experience)
