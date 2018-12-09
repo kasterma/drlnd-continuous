@@ -1,8 +1,8 @@
 from drlnd_continuous.noise import OUNoise
 import numpy as np
-import matplotlib.pyplot as plt
 import random
 import copy
+
 
 def test_run_noise():
     np.random.seed(42)
@@ -44,6 +44,8 @@ class OUNoise2:
 
 def plot_noise():
     """Draw some of the noise to see the development"""
+    import matplotlib.pyplot as plt   # put here b/c matplotlib needs framework python
+
     np.random.seed(41)
     noise = OUNoise(2)
     dat = np.array([noise.sample() for _ in range(1_000)])
