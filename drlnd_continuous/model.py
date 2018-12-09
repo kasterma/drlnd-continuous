@@ -53,7 +53,7 @@ class Actor(nn.Module):
         """Build an actor (policy) network that maps states -> actions."""
         x = F.relu(self.fc1(state))
         x = F.relu(self.fc2(x))
-        return F.tanh(self.fc3(x))
+        return torch.tanh(self.fc3(x))
 
     def get_copy(self) -> 'Actor':
         copy = Actor(self.state_size, self.action_size, self.fc1_units, self.fc2_units)
