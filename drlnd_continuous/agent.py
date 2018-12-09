@@ -126,11 +126,18 @@ class Agent:
         self.actor_optimizer.step()
 
         # ----------------------- update target networks ----------------------- #
-        Agent.__soft_update(self.critic_local, self.critic_target, TAU)
+        Agent._soft_update(self.critic_local, self.critic_target, TAU)
 
-        Agent.__soft_update(self.actor_local, self.actor_target, TAU)
+        Agent._soft_update(self.actor_local, self.actor_target, TAU)
 
     @staticmethod
-    def __soft_update(local_model, target_model, tau):
+    def _soft_update(local_model, target_model, tau):
+        """Move the weights from the target_model in the direction of the local_model.
+
+        The parameter tau determines how far this move is, we take a convex combination of the target and local weights
+        where as tau increases we take the combination closer to the local parameters (tau equal to 1 would replace
+        the target model with the local model, tau equal to 0 would perform no update and leave the target model as it
+        is).
+        """
         for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
             target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
