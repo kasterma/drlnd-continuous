@@ -42,7 +42,7 @@ def random_test_run():
 # random_test_run()
 
 
-def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100, run_id=0):
+def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_window=100):
     """Perfor a training run
 
     :param number_episodes the number of episodes to run through
@@ -52,21 +52,21 @@ def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100
     """
     log.info("Run with id %s", run_id)
     env = Reacher()
-    agent = Agent(replay_memory_size=10000, state_size=33, action_size=4)
+    agent = Agent(replay_memory_size=10000, state_size=33, action_size=4, actor_count=20)
     state = env.reset(train_mode=False)
     scores = []
-    scores_deque = deque(maxlen=print_every)
+    scores_deque = deque(maxlen=scores_window)
     for episode_idx in range(number_episodes):
         env.reset()
         agent.reset(episode_idx)
         score = 0
-        for step_idx in range(max_t):
+        while True:
             # noinspection PyUnresolvedReferences
-            act_random = np.clip(np.random.randn(20, 4), -1, 1)
-            step_result = env.step(act_random)
+            action = agent.get_action(state)
+            step_result = env.step(action)
             for agent_idx in range(20):
                 experience = Experience(state[agent_idx, :],
-                                        act_random[agent_idx, :],
+                                        action[agent_idx, :],
                                         step_result.rewards[agent_idx],
                                         step_result.next_state[agent_idx, :],
                                         step_result.done[agent_idx])
@@ -74,10 +74,11 @@ def train_run(number_episodes: int =500, max_t: int = 300, print_every: int =100
                 score += step_result.rewards[agent_idx]
             if np.any(step_result.done):
                 break
+            state = step_result.next_state
         scores.append(score)
         scores_deque.append(score)
         if episode_idx % print_every == 0:
-            log.info("Mean score over last %d episodes %f", print_every, np.mean(scores_deque))
+            log.info("%d Mean score over last %d episodes %f", episode_idx, scores_window, np.mean(scores_deque))
     agent.experiences.sample()
     log.info("Saving models under id %s", run_id)
     agent.save(run_id)
