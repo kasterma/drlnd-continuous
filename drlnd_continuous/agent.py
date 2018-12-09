@@ -80,7 +80,7 @@ class Agent:
     def get_action(self, state: np.ndarray, add_noise=True) -> np.ndarray:
         self.actor_local.eval()
         with torch.no_grad():
-            action = self.actor_local(state).cpu().numpy()
+            action = self.actor_local(torch.from_numpy(state).float().to(device)).cpu().numpy()
         if add_noise:
             action += self.noise.sample()
         return action
