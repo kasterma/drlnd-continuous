@@ -75,8 +75,8 @@ def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_w
             if np.any(step_result.done):
                 break
             state = step_result.next_state
-        scores.append(score)
-        scores_deque.append(score)
+        scores.append(score/20)
+        scores_deque.append(score/20)
         if episode_idx % print_every == 0:
             log.info("%d Mean score over last %d episodes %f", episode_idx, scores_window, np.mean(scores_deque))
     agent.experiences.sample()
