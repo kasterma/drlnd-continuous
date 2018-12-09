@@ -23,13 +23,13 @@ BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
 TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
-LR_CRITIC = 1e-3        # learning rate of the critic
+LR_CRITIC = 1e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
-UPDATE_EVERY = 4        # do a learning update after this many recorded experiences
+UPDATE_EVERY = 1        # do a learning update after this many recorded experiences
 
 
 class Agent:
-    def __init__(self, replay_memory_size, state_size, action_size, numpy_seed=36, random_seed=21, torch_seed=42):
+    def __init__(self, replay_memory_size, actor_count, state_size, action_size, numpy_seed=36, random_seed=21, torch_seed=42):
         log.info("Random seeds, numpy %d, random %d, torch %d.", numpy_seed, random_seed, torch_seed)
         # seed all sources of randomness
         torch.manual_seed(torch_seed)
@@ -39,6 +39,7 @@ class Agent:
 
         self.experiences = Experiences(memory_size=replay_memory_size, batch_size=BATCH_SIZE)
 
+        self.actor_count = actor_count
         self.state_size = state_size
         self.action_size = action_size
 
@@ -53,7 +54,7 @@ class Agent:
         self.critic_optimizer = optim.Adam(self.critic_local.parameters(), lr=LR_CRITIC, weight_decay=WEIGHT_DECAY)
 
         # Noise process
-        self.noise = OUNoise(action_size)
+        self.noise = OUNoise((self.actor_count, self.action_size))
 
         self.step_count = 0
         self.update_every = UPDATE_EVERY
