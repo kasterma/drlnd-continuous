@@ -75,7 +75,7 @@ class Agent:
         self.step_count += 1
         if len(self.experiences) > BATCH_SIZE and self.step_count % self.update_every == 0:
             log.debug("Doing a learning step")
-            self.__learn()
+            self._learn()
 
     def get_action(self, state: np.ndarray, add_noise=True) -> np.ndarray:
         self.actor_local.eval()
@@ -97,7 +97,7 @@ class Agent:
         self.critic_local.load_state_dict(torch.load("trained_model-critic_local-{id}.pth".format(id=run_identifier)))
         self.critic_target.load_state_dict(torch.load("trained_model-critic_target-{id}.pth".format(id=run_identifier)))
 
-    def __learn(self):
+    def _learn(self):
         gamma = GAMMA
         self.actor_local.train()  # the other models are never switched out of train mode
         states, actions, rewards, next_states, dones = self.experiences.sample()
