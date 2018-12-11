@@ -21,7 +21,7 @@ def random_test_run():
     In this interaction also interact with the Agent (to test this interaction while developing it)
     """
     env = Reacher()
-    agent = Agent(10000, action_size=4)
+    agent = Agent(10000, action_size=4, actor_count=20, state_size=33)
     state = env.reset(train_mode=False)
     for step_idx in range(100):
         # noinspection PyUnresolvedReferences
@@ -52,13 +52,13 @@ def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_w
     """
     log.info("Run with id %s", run_id)
     env = Reacher()
-    agent = Agent(replay_memory_size=10000, state_size=33, action_size=4, actor_count=20)
+    agent = Agent(replay_memory_size=100000, state_size=33, action_size=4, actor_count=20)
     state = env.reset(train_mode=False)
     scores = []
     scores_deque = deque(maxlen=scores_window)
     for episode_idx in range(number_episodes):
         env.reset()
-        agent.reset(episode_idx)
+        agent.reset()
         score = 0
         while True:
             # noinspection PyUnresolvedReferences
