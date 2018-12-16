@@ -4,6 +4,7 @@
 import logging.config
 from collections import deque
 
+import click
 import yaml
 
 from drlnd_continuous import *
@@ -15,6 +16,12 @@ logging.config.dictConfig(log_conf)
 log = logging.getLogger("agent")
 
 
+@click.group()
+def cli():
+    pass
+
+
+@click.command()
 def random_test_run():
     """Take 100 randomly generated steps in the environment
 
@@ -39,12 +46,14 @@ def random_test_run():
     agent.experiences.sample()
 
 
-# random_test_run()
-
-
-def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_window=100):
+@click.command()
+@click.option("--number_episodes", default=500, help="Number of episodes to run")
+@click.option("--print_every", default=1, help="How often to print the current progress", type=int)
+@click.option("--run_id", help="Integer part of run identifier")
+def train_run(number_episodes: int, print_every: int, run_id: int, scores_window=100):
     """Perfor a training run
 
+    :param scores_window: window for the sores (since the project specifies this we don't have an option for this)
     :param number_episodes the number of episodes to run through
     :param max_t max length of an episode
     :param print_every give an update on progress after this many episodes
@@ -91,8 +100,12 @@ def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_w
 # train_run(run_id=2)
 
 
-def test_run(number_episodes: int = 100, print_every: int = 1, run_id=0, scores_window=100):
-    log.info("Run test with id %s", run_id)
+@click.command()
+@click.option("--number_episodes", default=100, help="Number of episodes to run")
+@click.option("--print_every", default=1, help="How often to print the current progress", type=int)
+@click.option("--run_id", help="Integer part of run identifier")
+def evaluation_run(number_episodes: int, print_every: int, run_id, scores_window=100):
+    log.info("Run evaluation with id %s", run_id)
     env = Reacher()
     agent = Agent(replay_memory_size=100000, state_size=33, action_size=4, actor_count=20)
     agent.load(run_id)
@@ -108,7 +121,6 @@ def test_run(number_episodes: int = 100, print_every: int = 1, run_id=0, scores_
             # noinspection PyUnresolvedReferences
             action = agent.get_action(state, add_noise=False)
             step_result = env.step(action)
-            #print(step_result.rewards)
             score += np.mean(step_result.rewards)
             if np.any(step_result.done):
                 break
@@ -121,4 +133,9 @@ def test_run(number_episodes: int = 100, print_every: int = 1, run_id=0, scores_
     np.save("evaluate-scores-{}.npy".format(run_id), np.array(scores_deque))
 
 
-test_run(run_id=2)
+cli.add_command(evaluation_run, name="evaluation")
+cli.add_command(train_run, name="train")
+cli.add_command(random_test_run, name="random_run")
+
+if __name__ == "__main__":
+    cli()
