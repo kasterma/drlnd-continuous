@@ -79,10 +79,46 @@ def train_run(number_episodes: int =500, print_every: int =1, run_id=0, scores_w
         scores_deque.append(score/20)
         if episode_idx % print_every == 0:
             log.info("%d Mean score over last %d episodes %f", episode_idx, scores_window, np.mean(scores_deque))
+        if np.mean(scores_deque) > 30:
+            log.info("train success")
+            break
     agent.experiences.sample()
     log.info("Saving models under id %s", run_id)
     agent.save(run_id)
     log.info("Saving scores to file scores-%d.npy", run_id)
-    np.save("scores-{}.npy".format(run_id), np.array(scores))
+    np.save("scores-{}.npy".format(run_id), np.array(scores_deque))
 
-train_run()
+# train_run(run_id=2)
+
+
+def test_run(number_episodes: int = 100, print_every: int = 1, run_id=0, scores_window=100):
+    log.info("Run test with id %s", run_id)
+    env = Reacher()
+    agent = Agent(replay_memory_size=100000, state_size=33, action_size=4, actor_count=20)
+    agent.load(run_id)
+    state = env.reset(train_mode=True)
+    scores = []
+    scores_deque = deque(maxlen=scores_window)
+    for episode_idx in range(number_episodes):
+        env.reset(train_mode=True)
+        score = 0
+        ct = 0
+        while True:
+            ct += 1
+            # noinspection PyUnresolvedReferences
+            action = agent.get_action(state, add_noise=False)
+            step_result = env.step(action)
+            #print(step_result.rewards)
+            score += np.mean(step_result.rewards)
+            if np.any(step_result.done):
+                break
+            state = step_result.next_state
+        scores.append(score)
+        scores_deque.append(score)
+        if episode_idx % print_every == 0:
+            log.info("%d Mean score over last %d episodes %f (%d)", episode_idx, scores_window, np.mean(scores_deque), ct)
+
+    np.save("evaluate-scores-{}.npy".format(run_id), np.array(scores_deque))
+
+
+test_run(run_id=2)
