@@ -20,4 +20,6 @@ We have two models an Actor and a Critic model
 
 TODO: include plot of rewards per episode
 
+![scores](images/both-scores.png)
+
 ## Future Work
