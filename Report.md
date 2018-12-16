@@ -10,6 +10,12 @@ reference implementation
 
 ## Learning Algorithm
 
+### Model Architectures
+
+We have two models an Actor and a Critic model
+
+![architecture](images/network_architecture.png)
+
 ## Training development
 
 TODO: include plot of rewards per episode
