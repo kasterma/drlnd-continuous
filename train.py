@@ -49,7 +49,7 @@ def random_test_run():
 @click.command()
 @click.option("--number_episodes", default=500, help="Number of episodes to run")
 @click.option("--print_every", default=1, help="How often to print the current progress", type=int)
-@click.option("--run_id", help="Integer part of run identifier")
+@click.option("--run_id", help="Integer part of run identifier", type=int)
 def train_run(number_episodes: int, print_every: int, run_id: int, scores_window=100):
     """Perfor a training run
 
@@ -103,7 +103,7 @@ def train_run(number_episodes: int, print_every: int, run_id: int, scores_window
 @click.command()
 @click.option("--number_episodes", default=100, help="Number of episodes to run")
 @click.option("--print_every", default=1, help="How often to print the current progress", type=int)
-@click.option("--run_id", help="Integer part of run identifier")
+@click.option("--run_id", help="Integer part of run identifier", type=int)
 def evaluation_run(number_episodes: int, print_every: int, run_id, scores_window=100):
     log.info("Run evaluation with id %s", run_id)
     env = Reacher()
