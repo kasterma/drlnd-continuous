@@ -62,9 +62,9 @@ functions in the critic are relu activations.
 ![scores](images/both-scores.png)
 
 Here we show the episode score during training and evaluation.  The blue training line shows the scores obtained
-per episode during training.  here you can see that it learns quickly and around episode 25 has achieved around the
+per episode during training.  here you can see that it learns quickly and around episode 45 has achieved around the
 score it needs to achieve.  Then it needs to keep running at this efficiency to get the average score over 100 episodes
-above 30, that takes until episode 105.
+above 30, that takes until episode 121.
 
 Since these scores are obtained from the actor network with adding noise and our intention is not to use the actor in
 this way, this is not a completely appropriate evaluation of the network.  Hence we added a run of the network of
@@ -76,8 +76,10 @@ close to optimal score (optimal score in this environment is 40).
 The results obtained here were created using the example code as provided by udacity with minor tweaking of the
 hyperparameters.  Since in the evaluation we are already close to perfect score (we achieve around 39 on all
 episodes, and 40 is max achievable) there is just a small bit room for improvement in the final agent ability.  Also
-from the plot of rewards per episode we see that after some 30 episodes the agent is essentially trained, hence there
-is not much room for improvement in learning speed either.
+from the plot of rewards per episode we see that after some 45 episodes the agent is essentially trained, hence there
+is not much room for improvement in learning speed either (we have also had learning runs where the agent was at the
+stabilized score after 25 episodes; note here that although we set the seeds of all random generators we use on the
+learning side, we don't have access to the seed of the unity environment).
 
 Still using a more complicated challenge we would be very interested in implementing the distributed methods of learning
 such as Distributed Distributional Deterministic Policy Gradients.
