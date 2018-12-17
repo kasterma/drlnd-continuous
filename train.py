@@ -126,9 +126,10 @@ def evaluation_run(number_episodes: int, print_every: int, run_id, scores_window
         scores.append(score)
         scores_deque.append(score)
         if episode_idx % print_every == 0:
-            log.info("%d Mean score over last %d episodes %f (%d)", episode_idx, scores_window, np.mean(scores_deque), ct)
+            log.info("%d Mean score over last %d episodes %f (%d), mean score this episode %f",
+                     episode_idx, scores_window, np.mean(scores_deque), ct, score)
 
-    np.save("evaluate-scores-{}.npy".format(run_id), np.array(scores_deque))
+    np.save("evaluate-scores-{}.npy".format(run_id), np.array(scores))
 
 
 cli.add_command(evaluation_run, name="evaluation")
