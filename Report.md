@@ -46,9 +46,17 @@ We have two models an Actor and a Critic model
 
 ## Training development
 
-TODO: include plot of rewards per episode
-
 ![scores](images/both-scores.png)
+
+Here we show the episode score during training and evaluation.  The blue training line shows the scores obtained
+per episode during training.  here you can see that it learns quickly and around episode 25 has achieved around the
+score it needs to achieve.  Then it needs to keep running at this efficiency to get the average score over 100 episodes
+above 30, that takes until episode 105.
+
+Since these scores are obtained from the actor network with adding noise and our intention is not to use the actor in
+this way, this is not a completely appropriate evaluation of the network.  Hence we added a run of the network of
+100 episodes using the actor with no noise added.  All the scores of this run were around 39, showing the agent has
+close to optimal score (optimal score in this environment is 40).
 
 ## Future Work
 
