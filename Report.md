@@ -28,7 +28,7 @@ based on a provided reference implementation
 ### Hyperparameters
 
 | Parameter    |       Value |
-------------------------------
+|--------------|-------------|
 | BUFFER_SIZE  |  int(1e5)   |
 | BATCH_SIZE   |  128        |
 | GAMMA        |  0.99       |
