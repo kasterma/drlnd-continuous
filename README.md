@@ -16,24 +16,25 @@ To start working with the environment run
 and open `files/Continous_Control.ipynb`.  In this notebook (as provided by udacity) you can see some initial
 interaction with the Reacher environment, and with that see that the core dependencies are correctly installed.
 
-# TODO
 
-- In the unity environment there is a parameter train_mode; currently unclear what that does to the environment.
-- Set up in the better style of a package with src/ directory and tox for testing
-- Investiage the Ornstein-Uhlenbeck process some more; main question why not add some basic Gaussian noise
-  - after have functioning training process, try with different noise distributions
+    python train.py train --run_id=11
+    
+# File organisation
 
-# Notes
+In the `data` dir the results of the successful training run are stored (the models and both the training and evaluation
+scores).
 
-## run 0
+The `drlnd_continious` directory contains the key code other than the training driver.
 
-Didn't learn.  Looked at the noise some more, and the values are off.  Fixed to
-mean 0 noise for next run.
+The `images` directory contains the images for the report.
 
-## run 1
+The `tests` directory contains some testing code to experiement with interacting with different parts of the environment
+and other parts of the code.
 
-Didn't learn.
+The `venv` and `files` directories are created on `make setup` and contain the virtual env with all dependencies
+installed and the different downloaded files (e.g. Reacher.app).
 
-## run 2
+The `Makefile` contains all the commands needed to setup the environment
 
-Trying to reduce the noise over time.
+Finally the `train.py` file is the driver of the learning; this is where the training loop is located, where we run
+the environment and pass the experiences to the agent to learn from.
