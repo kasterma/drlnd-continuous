@@ -50,7 +50,10 @@ in training runs that did not succeed.
 
 ### Model Architectures
 
-We have two models an Actor and a Critic model
+We have two models an Actor and a Critic model.  The actor is a plain three layer model with relu activations after
+every layer except the last.  Since we need action values between -1 and 1 we used a tanh activation in the last
+layer.  The critic model also has three layers, but the action gets only input on the second level.  All activation
+functions in the critic are relu activations.
 
 ![architecture](images/network_architecture.png)
 
