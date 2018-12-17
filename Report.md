@@ -24,6 +24,16 @@ Reinforcement Learning, Lillicrap et al [archiv](https://arxiv.org/pdf/1509.0297
 based on a provided reference implementation
 [udacity pendulum reference implementation](https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-pendulum)
 
+The key properties of this algorithm are that it uses experience replay (we use a buffer of size 10.000), and we use
+soft updates on both the actor and critic (this means the target being updated to the convex combination of the
+target and local model with parameter TAU, which we set equal to 0.003).  Finally we use the Adam optimizer with
+learning rate 0.0001 for both the actor and the critic.
+
+An important parameter in learning is how often we do training.  This indicates how often a recorded experience can
+be used to learn from before it falls out of the limited experience storage (this is really a balancing between
+batch size and how often we learn (as set by the parameter UPDATE_EVERY)).  With the default batch size of 128 learning
+once after all the experiences from a step in the environment were recorded worked well, learning more often resulted
+in training runs that did not succeed.
 
 ### Hyperparameters
 
