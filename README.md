@@ -26,6 +26,21 @@ We have added the models and scores of a successful run in the `data` directory.
 
 # Environment
 
+The environment we are training in is the Unity ml-agents reacher environment
+
+![reacher](images/reacher.png)
+
+here you have a collection of double-jointed robot arms whose hands (the blue spheres) should be inside the targets the
+larger green spheres.  In this image there are 10 arms, but in the environment we interact with there are 20.  Each
+of these arms is controlled through an action that consists of four numbers between -1 and 1 indicating the torque
+applied in two dimensions to each of the joints.  The observation per arm consists of 33 variables corresponding to
+position, rotation, velocities, and angular velocities of the arm.  Any time step the robot hand is in the target a
+reward of +0.04 is earned.
+
+The environment is considered to be solved average episode score for 100 episodes is above 30.  The score of an
+episode is the average over all 20 agents, and the score for an agent is the sum of its rewards (i.e. no discounting).
+Since an episode consists of 1000 steps the maximum score that can be earned is 40.
+
 # File organisation
 
 In the `data` dir the results of the successful training run are stored (the models and both the training and evaluation
