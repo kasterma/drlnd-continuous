@@ -19,6 +19,25 @@ Since an episode consists of 1000 steps the maximum score that can be earned is 
 
 ## Learning Algorithm
 
+We are using the DDPG, _d_eep _d_eterministic _p_olicy _g_radient, algorithm (from Continous Control with Deep
+Reinforcement Learning, Lillicrap et al [archiv](https://arxiv.org/pdf/1509.02971.pdf)).  Our implementation is heavily
+based on a provided reference implementation
+[udacity pendulum reference implementation](https://github.com/udacity/deep-reinforcement-learning/tree/master/ddpg-pendulum)
+
+
+### Hyperparameters
+
+| Parameter    |       Value |
+------------------------------
+| BUFFER_SIZE  |  int(1e5)   |
+| BATCH_SIZE   |  128        |
+| GAMMA        |  0.99       |
+| TAU          |  1e-3       |
+| LR_ACTOR     |  1e-4       |
+| LR_CRITIC    |  1e-4       |
+| WEIGHT_DECAY |  0          |
+| UPDATE_EVERY |  20         |
+
 ### Model Architectures
 
 We have two models an Actor and a Critic model
