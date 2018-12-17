@@ -95,9 +95,7 @@ def train_run(number_episodes: int, print_every: int, run_id: int, scores_window
     log.info("Saving models under id %s", run_id)
     agent.save(run_id)
     log.info("Saving scores to file scores-%d.npy", run_id)
-    np.save("scores-{}.npy".format(run_id), np.array(scores_deque))
-
-# train_run(run_id=2)
+    np.save("scores-{}.npy".format(run_id), np.array(scores))
 
 
 @click.command()
