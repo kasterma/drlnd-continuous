@@ -1,3 +1,6 @@
+"""The experience recording buffer, and the class that stores the experiences.
+"""
+
 import random
 from collections import deque
 from typing import Tuple

@@ -24,7 +24,7 @@ def hidden_init(layer) -> Tuple[float, float]:
 class Actor(nn.Module):
     """Actor (Policy) Model."""
 
-    def __init__(self, state_size, action_size, fc1_units=200, fc2_units=150):
+    def __init__(self, state_size, action_size, fc1_units=200, fc2_units=150, reset_params=True):
         """Initialize parameters and build model.
         Params
         ======
@@ -42,7 +42,8 @@ class Actor(nn.Module):
         self.fc1 = nn.Linear(state_size, fc1_units)
         self.fc2 = nn.Linear(fc1_units, fc2_units)
         self.fc3 = nn.Linear(fc2_units, action_size)
-        self.reset_parameters()
+        if reset_params:
+            self.reset_parameters()
 
     def reset_parameters(self) -> None:
         self.fc1.weight.data.uniform_(*hidden_init(self.fc1))
@@ -56,7 +57,7 @@ class Actor(nn.Module):
         return torch.tanh(self.fc3(x))
 
     def get_copy(self) -> 'Actor':
-        copy = Actor(self.state_size, self.action_size, self.fc1_units, self.fc2_units)
+        copy = Actor(self.state_size, self.action_size, self.fc1_units, self.fc2_units, reset_params=False)
         for copy_param, self_param in zip(copy.parameters(), self.parameters()):
             copy_param.data.copy_(self_param.data)
         return copy
@@ -65,7 +66,7 @@ class Actor(nn.Module):
 class Critic(nn.Module):
     """Critic (Value) Model."""
 
-    def __init__(self, state_size, action_size, fcs1_units=200, fc2_units=150):
+    def __init__(self, state_size, action_size, fcs1_units=200, fc2_units=150, reset_params=True):
         """Initialize parameters and build model.
         Params
         ======
@@ -84,7 +85,8 @@ class Critic(nn.Module):
         self.fcs1 = nn.Linear(state_size, fcs1_units)
         self.fc2 = nn.Linear(fcs1_units+action_size, fc2_units)
         self.fc3 = nn.Linear(fc2_units, 1)
-        self.reset_parameters()
+        if reset_params:
+            self.reset_parameters()
 
     def reset_parameters(self) -> None:
         self.fcs1.weight.data.uniform_(*hidden_init(self.fcs1))
@@ -100,7 +102,7 @@ class Critic(nn.Module):
         return self.fc3(x)
 
     def get_copy(self) -> 'Critic':
-        copy = Critic(self.state_size, self.action_size, self.fc1_units, self.fc2_units)
+        copy = Critic(self.state_size, self.action_size, self.fc1_units, self.fc2_units, reset_params=False)
         for copy_param, self_param in zip(copy.parameters(), self.parameters()):
             copy_param.data.copy_(self_param.data)
         return copy

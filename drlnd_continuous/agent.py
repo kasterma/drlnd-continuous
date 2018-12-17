@@ -1,3 +1,8 @@
+"""This is the agent that takes care of the interaction between the learning driver (which passes generated
+experiences into this agent though `record_experiece`, and requests actions from the model through `get_action`) and
+the models which are here instantiated in the `__init__` function.
+"""
+
 import logging.config
 import random
 
@@ -18,6 +23,10 @@ with open("logging.yaml") as log_conf_file:
 logging.config.dictConfig(log_conf)
 log = logging.getLogger("agent")
 
+# The values set here still require some more investigations.  Most are given the default values from the example, but
+# e.g. the value of UPDATE_EVERY which regulates after how many recorded experiences a training step is performed was
+# the last value that needed fixing before effective training runs started happening.
+
 BUFFER_SIZE = int(1e5)  # replay buffer size
 BATCH_SIZE = 128        # minibatch size
 GAMMA = 0.99            # discount factor
@@ -25,7 +34,7 @@ TAU = 1e-3              # for soft update of target parameters
 LR_ACTOR = 1e-4         # learning rate of the actor
 LR_CRITIC = 1e-4        # learning rate of the critic
 WEIGHT_DECAY = 0        # L2 weight decay
-UPDATE_EVERY = 20        # do a learning update after this many recorded experiences
+UPDATE_EVERY = 20       # do a learning update after this many recorded experiences
 
 
 class Agent:
@@ -64,6 +73,9 @@ class Agent:
 
         In particular we reset the noise process; when passed an integer the noise is scaled down proportional to that
         integer.  Otherwise it is just a restart of the noise process.
+
+        Note: current training is without passing in a value for idx; we have not found a sequence that works better
+        than just resetting the noise to default values yet.
         """
         if idx:
             self.noise = OUNoise(self.action_size, mu=0.0, theta=1/(idx + 2), sigma=1/(idx + 2))
@@ -80,6 +92,7 @@ class Agent:
     def get_action(self, state: np.ndarray, add_noise=True) -> np.ndarray:
         self.actor_local.eval()
         with torch.no_grad():
+            # noinspection PyUnresolvedReferences
             action = self.actor_local(torch.from_numpy(state).float().to(device)).cpu().numpy()
         if add_noise:
             action += self.noise.sample()
@@ -127,7 +140,6 @@ class Agent:
 
         # ----------------------- update target networks ----------------------- #
         Agent._soft_update(self.critic_local, self.critic_target, TAU)
-
         Agent._soft_update(self.actor_local, self.actor_target, TAU)
 
     @staticmethod
